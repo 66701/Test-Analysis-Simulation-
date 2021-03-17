@@ -7,7 +7,6 @@ PATH = r"C:\Users\loren\Desktop\PythonProjectAE2223-I"
 Header = ['FML type', 'MVF', 'Thickness [mm]', r'MVF $E_{x}$[GPa]', r'MVF $\sigma_{y}$ [MPa]', r'MVF $\sigma_{ut}$ [MPa]', r'FEM $E_{x}$[GPa]', r'FEM $\sigma_{y}$ [MPa]', r'FEM $\sigma_{ut}$ [MPa]', r'EXP $E_{x}$[GPa]', r'EXP $\sigma_{y}$ [MPa]', r'EXP $\sigma_{ut}$ [MPa]']
 f = open(PATH + fname, 'r'); lines = f.readlines(); f.close()
 lines = list(map(lambda s: s.strip(), lines))
-
 counter, i = 0, 0
 for line in lines:
     if line == '':
@@ -48,7 +47,17 @@ for point in data:
     orderedData = [INF_tup, MVF_tup, FEM_tup, EXP_tup]
     finalData.append(orderedData)
 
-strain_u_Al = 16/100
+########################################################################################################################
+## Constituents:
+# stress-strain aluminium
+strainAl = np.array([0, 0.00407, 0.00422, 0.00454, 0.00526, 0.00856, 0.0144, 0.0254, 0.0385, 0.0554, 0.0841, 0.1512])
+stressAl = np.array([0, 300, 320, 340, 355, 375, 390, 410, 430, 450, 470, 484])
+stressAl = np.array([x*10**6 for x in stressAl])
+
+strainGlassEpoxy = np.array([0, 0.04])
+stressGlassEpoxy = np.array([0, 790*10**6])
+print(stressAl)
+strain_u_Al = 0.1512
 def stresStrain(E, sigma_y, x, sigma_u, strainAtFailure):
     '''
     :param E: Young's modulus from data
@@ -68,29 +77,68 @@ def stresStrain(E, sigma_y, x, sigma_u, strainAtFailure):
             result.append(sigma_y + (item-(sigma_y/E))*(sigma_u-sigma_y)/(strainAtFailure-(sigma_y/E))); continue
     return result
 
-def CompareFEM_MVF_EXP(finalData, maxStrain = strain_u_Al, dataNumber = 0):
+def CompareFEM_MVF_EXP(data, maxStrain = strain_u_Al, dataNumber = 0):
     '''
-    :param finalData: list of data from the extraction
+    :param data: list of data from the extraction
     :param dataNumber: row (from 0) in the table of the data to analyse
     :param maxStrain: Maximum strain of the laminate
     :return: Graph comparing FEM, MVF and EXP methods under the linear spline analysis
     '''
     strain = np.linspace(0, maxStrain, 100)
-    INF_results = finalData[dataNumber][0]
-    MVF_results = np.array(stresStrain(finalData[dataNumber][1][0], finalData[dataNumber][1][1], strain, finalData[dataNumber][1][2], maxStrain))
-    FEM_results = np.array(stresStrain(finalData[dataNumber][2][0], finalData[dataNumber][2][1], strain, finalData[dataNumber][2][2], maxStrain))
-    EXP_results = np.array(stresStrain(finalData[dataNumber][3][0], finalData[dataNumber][3][1], strain, finalData[dataNumber][3][2], maxStrain))
-    print(strain)
-    print(MVF_results)
+    # INF_results = data[dataNumber][0]
+    MVF_results = np.array(stresStrain(data[dataNumber][1][0], data[dataNumber][1][1], strain, data[dataNumber][1][2], maxStrain))
+    FEM_results = np.array(stresStrain(data[dataNumber][2][0], data[dataNumber][2][1], strain, data[dataNumber][2][2], maxStrain))
+    EXP_results = np.array(stresStrain(data[dataNumber][3][0], data[dataNumber][3][1], strain, data[dataNumber][3][2], maxStrain))
     plt.plot(strain*100, MVF_results*10**-6, label='MVF', c='b')
     plt.plot(strain*100, FEM_results*10**-6, label='FEM', c='darkorange')
     plt.plot(strain*100, EXP_results*10**-6, label='Test', c='g')
     plt.grid()
     plt.legend(loc='lower right')
-    # plt.title('My title')
+    # plt.title(data[dataNumber][0][0])
+    plt.text(0, 500, f'FML: {data[dataNumber][0][0]}\nMVF: {data[dataNumber][0][1]}', style='normal', fontsize=11,
+            bbox={'facecolor': 'white', 'alpha': 0.5, 'pad': 10})
     plt.xlabel('Strain [%]')
     plt.ylabel('Stress $\sigma$ [MPa]')
     plt.show()
-    # Note: tuple 1 is for basic infos, tuple 2 for MVF data, tuple 3 for FEM data, tuple 4 for EXP data
+    return True
 
-CompareFEM_MVF_EXP(finalData, strain_u_Al, 0)
+def CompareFMLs(data, FMLs, maxStrain):
+    '''
+
+    :param data: A list with all the required data
+    :param FMLs: A list with the number (starting from 0) of the FMLs in the table given by the supervisor
+    :param maxStrain: A list of the maximum strain in the same order as the FMLs
+    :return: graph comparing the FMLs
+    '''
+    i = 0
+    for FML in FMLs:
+        strain = np.linspace(0, maxStrain[i], 100)
+        EXP_results = np.array(stresStrain(data[FML][3][0], data[FML][3][1], strain, data[FML][3][2], maxStrain[i]))
+        plt.plot(strain*100, EXP_results*10**-6, label=data[FML][0][0])
+        i += 1
+    plt.legend(loc='lower right')
+    plt.grid()
+    plt.xlabel('Strain [%]')
+    plt.ylabel('Stress $\sigma$ [MPa]')
+    plt.show()
+    return True
+
+def CompareFML_Constituents(data, dataNumber):
+    '''
+    Note that all GLARE analysed are made of aluminium and glass epoxy, therefore, no special consideration for different values the constituents was taken.
+    :param data:
+    :param dataNumber:
+    :return: Graph comparing the constituents to the FML
+    '''
+    plt.plot(strainAl*100, stressAl/10**6, label='Aluminium')
+    strain = np.linspace(0, strain_u_Al, 100)
+    EXP_results = np.array(stresStrain(data[dataNumber][3][0], data[dataNumber][3][1], strain, data[dataNumber][3][2], strain_u_Al))
+    plt.plot(strain*100, EXP_results/10**6, label=f'{data[dataNumber][0][0]}')
+    plt.plot(strainGlassEpoxy*100, stressGlassEpoxy/10**6, label='Glass Epoxy')
+    plt.legend(loc='lower right')
+    plt.grid()
+    plt.xlabel('Strain [%]')
+    plt.ylabel('Stress $\sigma$ [MPa]')
+    plt.show()
+
+CompareFML_Constituents(finalData, 10)
