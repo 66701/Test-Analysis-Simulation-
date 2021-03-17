@@ -36,22 +36,13 @@ Polyfit_fem=[]
 Polyfit_exp=[]
 
 for i in range(len(Coordpairs_fem_y)):
-    x=[0]
-    x.append(Coordpairs_fem_y[i][0])
-    x.append(Coordpairs_fem_u[i][0])
-    y=[0]
-    y.append(Coordpairs_fem_y[i][1])
-    y.append(Coordpairs_fem_u[i][1])
+    x=[0, Coordpairs_fem_y[i][0], Coordpairs_fem_u[i][0]]
+    y=[0, Coordpairs_fem_y[i][1], Coordpairs_fem_u[i][1]]
     Polyfit_fem.append(Polynomial(lagrange(x,y)).coef)
     
-    x=[0]
-    x.append(Coordpairs_exp_y[i][0])
-    x.append(Coordpairs_exp_u[i][0])
-    y=[0]
-    y.append(Coordpairs_exp_y[i][1])
-    y.append(Coordpairs_exp_u[i][1])
-    Polyfit_exp.append(Polynomial(lagrange(x,y)).coef)
-    
+    xx=[0, Coordpairs_exp_y[i][0], Coordpairs_exp_u[i][0]]
+    yy=[0, Coordpairs_exp_y[i][1], Coordpairs_exp_u[i][1]]
+    Polyfit_exp.append(Polynomial(lagrange(xx,yy)).coef)
 
 def PolyCoefficients(x, coeffs):
     """ Returns a polynomial for ``x`` values for the ``coeffs`` provided.
