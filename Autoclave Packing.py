@@ -1,6 +1,6 @@
 import random
 ####### Generate data to process
-W, H = [100, 100] # Arbitrary Autoclave dimension
+W, H = [1000, 1500] # LAB 115 Autoclave dimensions in [mm]
 Autoclave_area = W*H
 # Define dimensions of jobs to be completed
 Dimensions = []
