@@ -40,9 +40,13 @@ def plotr(coord):
         y.append(coord[i][1])
     x=(list(dict.fromkeys(x)))
     y=(list(dict.fromkeys(y)))
-    f = interpolate.interp1d(x, y,kind='slinear')
+    f = interpolate.interp1d(x, y,kind='cubic')
     xnew = np.arange(0, x[-1], .001)
     ynew = f(xnew)   
-    plt.plot(x, y, 'o', xnew, ynew, '-')
+    plt.plot(x, y, 'o', xnew, ynew, '--')
+    plt.xlabel("Strain (%)")
+    plt.yllabel("Stress (MPa)")
+    #plt.title("Stress Strain Curve for Composite")
     plt.show()
+    
     
