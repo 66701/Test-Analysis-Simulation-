@@ -49,7 +49,7 @@ class Bin:
 	def show(self):
 		return self.list
 
-def first_fit(areas, max_area): # Returns list of bins with input items inside
+def greedy(areas, max_area): # Returns list of bins with input items inside
     list_bins = []; list_bins.append(Bin())  # Add first empty bin to list
 
     for item in areas:
@@ -66,4 +66,4 @@ def first_fit(areas, max_area): # Returns list of bins with input items inside
     for bin in list_bins:
         areas.append(bin.show())# Turn bins into list of items and return
     return (areas)
-print(first_fit(sorted_areas, Autoclave_area))
+print(greedy(sorted_areas, Autoclave_area))
