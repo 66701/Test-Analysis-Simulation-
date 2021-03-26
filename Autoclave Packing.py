@@ -49,21 +49,24 @@ class Bin:
 	def show(self):
 		return self.list
 
-def greedy(areas, max_area): # Returns list of bins with input items inside
-    list_bins = []; list_bins.append(Bin())  # Add first empty bin to list
+def greedy(areas, max_area): # Will return the list of autoclave cycles with ply areas allocated to them
+    autoclaves = []; autoclaves.append(Bin())  # Add first empty bin to list
 
     for item in areas:
-        bin_found = False # Go through bins and try to allocate
-        for bin in list_bins:
+        bin_found = False # Allocating the bins
+        for autoclave in autoclaves:
             if bin.sum() + item <= max_area:
                 bin.addItem(item)
                 bin_found = True; break
-        # If item not allocated in bins in list, create new bin and allocate it to it.
+        # If cannot locate the job in the bin make a new one
         if bin_found == False:
-            newBin = Bin(); newBin.addItem(item); list_bins.append(newBin)
+            newBin = Bin(); newBin.addItem(item); autoclave.append(newBin)
     
     areas = []
     for bin in list_bins:
-        areas.append(bin.show())# Turn bins into list of items and return
+        areas.append(bin.show())# Bins are transformed into lists of areas
     return (areas)
+
 print(greedy(sorted_areas, Autoclave_area))
+
+#Note bin and autoclave are used interchangably 
