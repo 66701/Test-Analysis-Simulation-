@@ -3,12 +3,8 @@ import random
 W, H = [100, 100] #Arbitrary Autoclave dimension
 Autoclave_area = W*H
 #Define dimensions of jobs to be completed
-
 Dimensions = []
-
 list = range(0,41) #number of jobs
-
-#Define dimensions of job using random function 
 for i in list:
     if i < 10:
         W1 = random.randrange(int(2/3*W), W)
@@ -28,18 +24,12 @@ for i in list:
         Dimensions.append([W1, H1])
 
 random.shuffle(Dimensions)
-
 Areas = [item[0]*item[1] for item in Dimensions]
-
 list_of_autoclaves = []
-
 #Sort list in decreasing order then apply the algorithm
-
 sorted_areas = sorted(Areas, reverse = True)
 
 #Define bin class
-
-
 class Bin:
 	def __init__(self):
 		self.list = []
@@ -61,31 +51,22 @@ class Bin:
 
 def first_fit(areas, max_area):
     # Returns list of bins with input items inside
-    list_bins = []
-    list_bins.append(Bin())  # Add first empty bin to list
+    list_bins = []; list_bins.append(Bin())  # Add first empty bin to list
 
     for item in areas:
-        # Go through bins and try to allocate
-        bin_found = False
+        bin_found = False # Go through bins and try to allocate
 
         for bin in list_bins:
             if bin.sum() + item <= max_area:
                 bin.addItem(item)
-                bin_found = True
-                break
+                bin_found = True; break
 
-        # If item not allocated in bins in list, create new bin
-        # and allocate it to it.
+        # If item not allocated in bins in list, create new bin and allocate it to it.
         if bin_found== False:
-            newBin = Bin()
-            newBin.addItem(item)
-            list_bins.append(newBin)
-
-    # Turn bins into list of items and return
+            newBin = Bin(); newBin.addItem(item); list_bins.append(newBin)
+    
     areas = []
     for bin in list_bins:
-        areas.append(bin.show())
-
+        areas.append(bin.show())# Turn bins into list of items and return
     return (areas)
-
 print(first_fit(sorted_areas, Autoclave_area))
