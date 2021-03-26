@@ -8,6 +8,7 @@ Dimensions = []
 
 list = range(0,41) #number of jobs
 
+#Define dimensions of job using random function 
 for i in list:
     if i < 10:
         W1 = random.randrange(int(2/3*W), W)
